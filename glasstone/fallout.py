@@ -66,7 +66,7 @@ class WSEG10:
         self.s_x = np.sqrt(self.s_x2) # sigma_x
         self.L_2 = self.L_02 + 2 * self.s_x2
         self.L = np.sqrt(self.L_2) # L
-        self.n = (ff * self.L_02 + self.s_x2) / (self.L_02 + 0.5 * self.s_x2) # n
+        self.n = (self.L_02 + self.s_x2) / (self.L_02 + 0.5 * self.s_x2) # n
         self.a_1 = 1 / (1 + ((0.001 * self.H_c * wind) / self.s_0)) # alpha_1
 
     def g(self, x):
@@ -110,7 +110,7 @@ function phi is empirically inserted."""
     def fallouttoa(self, x):
         """Average time-of-arrival for fallout along hotline at x. Minimum is 0.5hr for any location."""
         T_1 = 1.0
-        return np.sqrt(0.25 + (self.L_02 * (x + 2 * self.s_x2) * self.T_c**2) / (self.L_2 * (self.L_02 + 0.5 * self.s_x2)) + ((2 * self.s_x2 * T_1**2) / (self.L_02 + 0.5 * self.s_x)))
+        return np.sqrt(0.25 + (self.L_02 * (x + 2 * self.s_x) * (x + 2 * self.s_x) * self.T_c**2) / (self.L_2 * (self.L_02 + 0.5 * self.s_x2)) + ((2 * self.s_x2 * T_1**2) / (self.L_02 + 0.5 * self.s_x2)))
 
     def dose(self, x, y, dunits='km', doseunits='Sv'):
         """Estimate of total "Equivalent Residual Dose" (ERD) at location x, y from time of fallout arrival to 30 days, including a 90% recovery factor. 
@@ -127,5 +127,5 @@ function phi is empirically inserted."""
         # as Bio = (t / 19)**0.33, so that the dose at some time after activity
         # arrival is defined as Dose = DH+1 * Bio. Further refinements in the model
         # resulted in a second order approximation for Bio used here:
-        bio = np.exp(-(0.287 + 0.52 * np.log(t_a / 31.6) + 0.04475 * np.log((t_a / 31.6)**2)))
+        bio = np.exp(-(0.287 + 0.52 * np.log(t_a / 31.6) + 0.04475 * (np.log(t_a / 31.6))**2))
         return self.D_Hplus1(x, y, dunits=dunits, doseunits=doseunits) * bio
